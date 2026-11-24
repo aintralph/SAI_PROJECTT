@@ -152,3 +152,11 @@ Not implemented: `accounts/health.html`/health route; model-backed record creati
 All classes defined in `static/css/main.css` (including state/modifier classes):
 
 `shell`, `side`, `main`, `content`, `cols`, `auth-wrap`, `skip`, `brand`, `mark-frame`, `mark-glyph`, `brand-name`, `brand-sub`, `nav`, `nav-label`, `nav-item`, `on`, `side-foot`, `avatar`, `who`, `topbar`, `crumb`, `topbar-right`, `role-pill`, `page-head`, `actions`, `btn`, `btn-primary`, `btn-ghost`, `strip`, `metric`, `num`, `unit`, `src`, `panel`, `panel-head`, `count`, `right`, `filter`, `panel-body`, `r`, `mono`, `status`, `pager`, `mini`, `t`, `tiles`, `tile`, `k`, `go`, `kv`, `form`, `field`, `req`, `input`, `checkbox`, `hint`, `err`, `alert`, `bad`, `ok`, `empty`, `note`, `soonbox`, `badge`, `auth-card`, `sub`, `auth-foot`, `btn-block`, `theme-btn`, `soon`, `tone-ok`, `tone-warn`, `tone-danger`, `tone-info`, `dot`, `warn`, `danger`, `info`, `frame`, `row`, `stack`, `mt`, `muted`, `small`, `table-scroll`.
+
+## Amendment — 2026-11-24
+
+- Added `base_auth.html` as the second base template for signed-out screens.
+- `login.html` extends `base_auth.html`, not `base.html`.
+- Added one component rule block: `.auth-bar`.
+- Sidebar navigation and the current-user footer render only for authenticated users.
+- Theme icons now switch by theme using `.theme-moon` and `.theme-sun`; the button label describes the action.

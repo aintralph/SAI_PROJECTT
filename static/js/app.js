@@ -3,6 +3,14 @@
   const root = document.documentElement;
 
   if (themeButton) {
+    const updateThemeLabel = () => {
+      const action = root.dataset.theme === "dark"
+        ? "Switch to light theme"
+        : "Switch to dark theme";
+      themeButton.setAttribute("aria-label", action);
+      themeButton.title = action;
+    };
+
     try {
       const savedTheme = window.localStorage.getItem("sia-theme");
       if (savedTheme === "light" || savedTheme === "dark") {
@@ -11,10 +19,12 @@
     } catch (error) {
       console.error("Unable to read the saved theme preference.", error);
     }
+    updateThemeLabel();
 
     themeButton.addEventListener("click", () => {
       const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
       root.dataset.theme = nextTheme;
+      updateThemeLabel();
       try {
         window.localStorage.setItem("sia-theme", nextTheme);
       } catch (error) {

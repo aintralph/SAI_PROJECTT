@@ -1,35 +1,30 @@
-{% extends "base.html" %}
-
-{% block title %}Sign in | Sample Project{% endblock %}
+{% extends "base_auth.html" %}
 
 {% block content %}
-<div class="auth-wrap">
-  <section class="auth-card">
-    <h1>Sign in</h1>
-    <p class="sub">Sample Project</p>
-    {% if form.errors %}
-      <div class="alert bad" role="alert">
-        <b>Sign in failed.</b>
-        <ul>
-          {% for error in form.non_field_errors %}
-            <li>{{ error }}</li>
-          {% endfor %}
-          {% for field in form %}
-            {% for error in field.errors %}
-              <li>{{ field.label }}: {{ error }}</li>
-            {% endfor %}
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
-    <form method="post" class="form">
-      {% csrf_token %}
-      {% for field in form %}
-        {% include "partials/field.html" with field=field %}
+<div class="auth-card">
+  <h1>Sign in</h1>
+  <p class="sub">Sample Project</p>
+  <form method="post" action="{% url 'login' %}" class="form">
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+      <div class="err" role="alert">{{ error }}</div>
+    {% endfor %}
+    <div class="field">
+      <label for="{{ form.username.id_for_label }}">Username</label>
+      <input class="input" type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default_if_none:'' }}" autocomplete="username" autocapitalize="none" maxlength="{{ form.username.field.max_length }}" autofocus required{% if form.username.errors %} aria-invalid="true"{% endif %}>
+      {% for error in form.username.errors %}
+        <div class="err">{{ error }}</div>
       {% endfor %}
-      <button class="btn btn-primary btn-block" type="submit">Sign in</button>
-    </form>
-    <div class="auth-foot">Use your assigned account to sign in.</div>
-  </section>
+    </div>
+    <div class="field">
+      <label for="{{ form.password.id_for_label }}">Password</label>
+      <input class="input" type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}" autocomplete="current-password" required{% if form.password.errors %} aria-invalid="true"{% endif %}>
+      {% for error in form.password.errors %}
+        <div class="err">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <button class="btn btn-primary btn-block" type="submit" data-once>Sign in</button>
+  </form>
+  <div class="auth-foot">Use your assigned account to sign in.</div>
 </div>
 {% endblock %}

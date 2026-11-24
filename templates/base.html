@@ -12,7 +12,16 @@
 <div class="shell">
   {% include "partials/sidebar.html" %}
   <div class="main">
-    {% include "partials/topbar.html" %}
+    <header class="topbar">
+      {% if crumb_current %}
+        <div class="crumb">
+          <span>{{ crumb_parent|default:"Workspace" }}</span>
+          <span>/</span>
+          <b>{{ crumb_current }}</b>
+        </div>
+      {% endif %}
+      {% include "partials/topbar.html" %}
+    </header>
     {% include "partials/messages.html" %}
     <main class="content" id="main" tabindex="-1">
       {% block content %}{% endblock %}
