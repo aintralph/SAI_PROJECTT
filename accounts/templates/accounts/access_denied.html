@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Access denied | Sample Project{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Access denied</h1>
+    <p>{{ denial_reason }}</p>
+    <p>Route: <span class="mono">{{ attempted_route }}</span></p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{% url 'dashboard' %}">Dashboard</a>
+  </div>
+</div>
+{% endblock %}

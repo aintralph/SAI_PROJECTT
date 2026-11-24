@@ -1,0 +1,19 @@
+<section class="panel">
+  <div class="panel-head">
+    <h2>Awaiting you</h2>
+    <span class="count">{{ queue|length }}</span>
+  </div>
+  <ul class="mini">
+    {% for item in queue %}
+      <li>
+        <div class="t">
+          <b>{{ item.title }}</b>
+          <span>{{ item.subtitle }}</span>
+        </div>
+        {% if item.time %}<time>{{ item.time }}</time>{% endif %}
+      </li>
+    {% empty %}
+      <li><div class="t"><b>Nothing waiting</b><span>No action is required from you right now.</span></div></li>
+    {% endfor %}
+  </ul>
+</section>

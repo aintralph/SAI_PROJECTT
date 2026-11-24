@@ -1,0 +1,4 @@
+<svg width="23" height="23" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+  <rect x="1" y="1" width="24" height="24" rx="5" stroke="currentColor" stroke-width="1.4" class="mark-frame"/>
+  <path d="M7.5 17.5V8.5l11 9v-9" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" class="mark-glyph"/>
+</svg>

@@ -1,0 +1,9 @@
+{% if messages %}
+<div role="status" aria-live="polite">
+  {% for message in messages %}
+    <div class="alert{% if message.tags == 'error' %} bad{% elif message.tags == 'success' %} ok{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}

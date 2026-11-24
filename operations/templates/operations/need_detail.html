@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ reference }} | Sample Project{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1 class="mono">{{ reference }}</h1>
+    <p>{{ module.label }}</p>
+    <p><span class="status"><i class="dot"></i>{{ status }}</span></p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{{ module.url }}">Back to list</a>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><h2>Fields</h2></div>
+  <div class="panel-body">
+    {% if fields %}
+      <dl class="kv">
+        {% for field in fields %}
+          <dt>{{ field.label }}</dt>
+          <dd>{{ field.value }}</dd>
+        {% endfor %}
+      </dl>
+    {% else %}
+      {% with title="Record not found" body="Records are not connected to a database yet." %}
+        {% include "operations/partials/empty_state.html" %}
+      {% endwith %}
+    {% endif %}
+  </div>
+</section>
+
+<section class="panel mt">
+  <div class="panel-head"><h2>Linked records</h2></div>
+  <div class="panel-body">
+    <ul class="mini">
+      {% for linked in chain %}
+        <li><i class="dot"></i><a class="mono" href="{% url 'need_detail' linked.module_key linked.reference %}">{{ linked.reference }}</a></li>
+      {% empty %}
+        <li>Nothing is linked yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="panel mt">
+  <div class="panel-head"><h2>Actions</h2></div>
+  <div class="panel-body">
+    {% if actions %}
+      {% for action in actions %}
+        <a class="btn btn-ghost" href="{{ action.url }}">{{ action.label }}</a>
+      {% endfor %}
+    {% else %}
+      <p>{{ action_message }}</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

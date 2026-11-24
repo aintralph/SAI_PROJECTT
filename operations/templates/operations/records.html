@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}{{ module.label }} | Sample Project{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ module.label }}</h1>
+    <p>{{ record_count }} records</p>
+    <p>Data source: {{ data_source }}</p>
+    <p>Access: {{ module.access }}</p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{% url 'dashboard' %}">Dashboard</a>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>{{ module.label }}</h2>
+    <span class="count">{{ record_count }}</span>
+  </div>
+  <div class="panel-body">
+    {% include "operations/partials/records_table.html" %}
+  </div>
+</section>
+{% endblock %}

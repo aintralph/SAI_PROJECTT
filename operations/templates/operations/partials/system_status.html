@@ -1,0 +1,12 @@
+<section class="panel">
+  <div class="panel-head"><h2>System status</h2></div>
+  <div class="soonbox">
+    <span class="badge">Not connected</span>
+    <h3>SAP integration</h3>
+    <p>Balances, approvals and receipts are not read from or written to SAP.</p>
+    <dl>
+      <dt>Source</dt><dd>{{ status.source|default:"Manual entry" }}</dd>
+      <dt>Last sync</dt><dd>{{ status.last_sync|default:"None" }}</dd>
+    </dl>
+  </div>
+</section>

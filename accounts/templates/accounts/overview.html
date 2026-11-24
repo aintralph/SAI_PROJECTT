@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}My workspaces | Sample Project{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div><h1>My workspaces</h1></div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{% url 'dashboard' %}">Dashboard</a>
+  </div>
+</div>
+
+<div class="tiles">
+  {% for role in roles %}
+    <a class="tile" href="{% url 'dashboard' %}">
+      <span class="k">Workspace</span>
+      <b>{{ role.label }}</b>
+      <span class="go">Open →</span>
+    </a>
+  {% empty %}
+    {% with title="No role assigned" body="An administrator must assign a role before a workspace is available." %}
+      {% include "operations/partials/empty_state.html" %}
+    {% endwith %}
+  {% endfor %}
+</div>
+{% endblock %}

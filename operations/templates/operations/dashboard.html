@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Sample Project{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ role.label|default:"Workspace" }}</h1>
+    {% if role_description %}<p>{{ role_description }}</p>{% endif %}
+  </div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="{% url 'access_map' %}">Access map</a>
+    <a class="btn btn-primary" href="{{ primary_action.url }}">{{ primary_action.label }}</a>
+  </div>
+</div>
+
+{% include "operations/partials/metric_strip.html" %}
+
+<div class="cols">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Your modules</h2>
+      <span class="count">{{ module_count }} for this role</span>
+    </div>
+    <div class="panel-body">
+      <div class="tiles">
+        {% include "operations/partials/module_tiles.html" %}
+      </div>
+    </div>
+  </section>
+
+  <div class="stack">
+    {% include "operations/partials/queue_list.html" %}
+    {% include "operations/partials/system_status.html" %}
+  </div>
+</div>
+
+<p class="note"><b>Development build.</b> {% if records_connected %}Records are real database rows.{% else %}Records are not connected to a database yet.{% endif %} SAP, email and payment steps are external and are recorded as references only.</p>
+{% endblock %}

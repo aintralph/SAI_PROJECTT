@@ -1,0 +1,32 @@
+{% if rows %}
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        {% for column in columns %}
+          <th scope="col"{% if column.kind == "number" %} class="r"{% endif %}>{{ column.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          {% for cell in row %}
+            <td{% if cell.kind == "number" %} class="r"{% elif cell.kind == "reference" %} class="mono"{% endif %}>
+              {% if cell.kind == "status" %}
+                <span class="status"><i class="dot{% if cell.tone %} {{ cell.tone }}{% endif %}"></i>{{ cell.value }}</span>
+              {% elif cell.kind == "reference" %}
+                <a href="{% url 'need_detail' module.key cell.value %}">{{ cell.value }}</a>
+              {% else %}
+                {{ cell.value }}
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  {% include "operations/partials/empty_state.html" %}
+{% endif %}

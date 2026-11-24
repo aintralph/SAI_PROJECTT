@@ -1,0 +1,7 @@
+<div class="empty">
+  <h2>{{ title }}</h2>
+  <p>{{ body }}</p>
+  {% if action_label and action_url %}
+    <a class="btn btn-ghost" href="{{ action_url }}">{{ action_label }}</a>
+  {% endif %}
+</div>

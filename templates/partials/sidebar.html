@@ -1,0 +1,45 @@
+<aside class="side">
+  <div class="brand">
+    {% include "partials/mark.svg" %}
+    <div>
+      <div class="brand-name">{{ brand_name|default:"Sample Project" }}</div>
+      <div class="brand-sub">{{ brand_sub|default:"Indirect materials" }}</div>
+    </div>
+  </div>
+
+  {% with current_url=request.resolver_match.url_name %}
+  <nav class="nav">
+    <div class="nav-label">Workspace</div>
+    <a class="nav-item{% if current_url == 'dashboard' %} on{% endif %}"
+       href="{% url 'dashboard' %}"{% if current_url == 'dashboard' %} aria-current="page"{% endif %}>Dashboard</a>
+    {% for item in nav_modules %}
+      {% if item.url %}
+        <a class="nav-item{% if active_module == item.key %} on{% endif %}"
+           href="{{ item.url }}"{% if active_module == item.key %} aria-current="page"{% endif %}>{{ item.label }}</a>
+      {% else %}
+        <span class="nav-item" aria-disabled="true">{{ item.label }} <span class="soon">Not connected</span></span>
+      {% endif %}
+    {% endfor %}
+
+    <div class="nav-label">Account</div>
+    <a class="nav-item{% if current_url == 'access_map' %} on{% endif %}"
+       href="{% url 'access_map' %}"{% if current_url == 'access_map' %} aria-current="page"{% endif %}>Access map</a>
+    <a class="nav-item{% if current_url == 'overview' %} on{% endif %}"
+       href="{% url 'overview' %}"{% if current_url == 'overview' %} aria-current="page"{% endif %}>My workspaces</a>
+    <a class="nav-item{% if current_url == 'password_change' %} on{% endif %}"
+       href="{% url 'password_change' %}"{% if current_url == 'password_change' %} aria-current="page"{% endif %}>Change password</a>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button class="nav-item" type="submit">Sign out</button>
+    </form>
+  </nav>
+  {% endwith %}
+
+  <div class="side-foot">
+    <div class="avatar">{{ user.get_username|slice:":2"|upper }}</div>
+    <div class="who">
+      <b>{{ user.get_username }}</b>
+      <span>{{ role.label }}</span>
+    </div>
+  </div>
+</aside>

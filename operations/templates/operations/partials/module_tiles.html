@@ -1,0 +1,22 @@
+{% for m in modules %}
+  {% url m.url_name m.key as module_url %}
+  {% if module_url %}
+    <a class="tile" href="{{ module_url }}">
+      <span class="k">Available now</span>
+      <b>{{ m.label }}</b>
+      <p>{{ m.description }}</p>
+      <span class="go">Open →</span>
+    </a>
+  {% else %}
+    <div class="tile" aria-disabled="true">
+      <span class="k">Not connected</span>
+      <b>{{ m.label }}</b>
+      <p>{{ m.description }}</p>
+      <span class="go">Not connected</span>
+    </div>
+  {% endif %}
+{% empty %}
+  {% with title="No modules available" body="No modules are available for this role." %}
+    {% include "operations/partials/empty_state.html" %}
+  {% endwith %}
+{% endfor %}

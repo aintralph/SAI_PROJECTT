@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>End-user / Maintenance Lead workspace · Sample Project</title>
+  <style>:root{
+  --bg:#F4F7F8; --surface:#FFFFFF; --surface-2:#EDF2F4; --surface-3:#E4ECEE;
+  --border:#DCE6E8; --border-strong:#C6D5D9;
+  --text:#14262F; --text-2:#3D5563; --muted:#5B7180; --faint:#7E93A0;
+  --navy:#16364B; --deep:#0F2738; --teal:#00857C; --teal-ink:#006860;
+  --teal-wash:rgba(0,133,124,.09);
+  --ok:#1F7A4D; --warn:#9A6100; --danger:#B3261E;
+  --ok-wash:rgba(31,122,77,.10); --warn-wash:rgba(154,97,0,.12); --danger-wash:rgba(179,38,30,.10);
+  --radius:5px;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#0A141C; --surface:#101F2A; --surface-2:#162834; --surface-3:#1C3140;
+  --border:#22394A; --border-strong:#2E4A5D;
+  --text:#E8F0F2; --text-2:#B7C9D2; --muted:#8CA3AF; --faint:#6E8794;
+  --navy:#CFE0E6; --teal:#2BC0B0; --teal-ink:#7FE0D4; --teal-wash:rgba(43,192,176,.13);
+  --ok:#5BC48C; --warn:#D9A440; --danger:#F07167;
+  --ok-wash:rgba(91,196,140,.14); --warn-wash:rgba(217,164,64,.14); --danger-wash:rgba(240,113,103,.14);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:3px}
+.shell{display:grid;grid-template-columns:238px 1fr;min-height:100vh}
+.side{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:10px;padding:15px}
+.brand .mark-frame{color:var(--navy)} .brand .mark-glyph{color:var(--teal)}
+.brand-name{font-size:12.5px;font-weight:600;line-height:1.2}
+.brand-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;color:var(--faint);text-transform:uppercase;margin-top:3px}
+.nav{padding:11px 9px;flex:1}
+.nav-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);padding:0 8px;margin:2px 0 7px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:var(--radius);font-size:12.5px;color:var(--text-2);width:100%;text-align:left}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item.on{background:var(--teal-wash);color:var(--teal-ink);font-weight:600}
+.side-foot{border-top:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:9px}
+.avatar{width:27px;height:27px;border-radius:50%;background:var(--deep);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:600;font-family:var(--mono)}
+[data-theme="dark"] .avatar{background:var(--teal);color:#08222A}
+.who{min-width:0;flex:1}
+.who b{display:block;font-size:11.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who span{display:block;font-size:10px;color:var(--muted)}
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;gap:10px;padding:11px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.crumb{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.crumb b{color:var(--text);font-weight:600}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:7px}
+.role-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-strong);border-radius:99px;padding:3px 9px;font-size:10.5px;font-weight:600;color:var(--text-2)}
+.role-pill i{width:5px;height:5px;border-radius:50%;background:var(--teal);display:block}
+.content{padding:20px 22px 32px;max-width:1180px;width:100%}
+.page-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+.page-head h1{font-size:21px;line-height:1.25;letter-spacing:-.02em;margin:0;font-weight:600}
+.page-head p{margin:5px 0 0;font-size:12.5px;color:var(--muted);max-width:68ch}
+.page-head .actions{margin-left:auto;display:flex;gap:7px;flex:0 0 auto;padding-top:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:var(--radius);font-size:12.5px;font-weight:600;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn-primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal-ink);border-color:var(--teal-ink)}
+[data-theme="dark"] .btn-primary{color:#04211D}
+.btn-ghost{border-color:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--surface-2)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);margin-bottom:16px;overflow:hidden}
+.metric{padding:11px 13px;border-right:1px solid var(--border)}
+.metric:last-child{border-right:0}
+.metric dt{font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 6px}
+.metric dd{margin:0;display:flex;align-items:baseline;gap:6px}
+.metric .num{font-size:19px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.metric .unit{font-size:11px;color:var(--muted)}
+.metric .src{display:block;margin-top:5px;font-size:9.5px;color:var(--faint)}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:16px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+.panel-head{display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--border)}
+.panel-head h2{font-size:12.5px;font-weight:600;margin:0}
+.panel-head .count{font-family:var(--mono);font-size:10px;color:var(--faint)}
+.panel-head .right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.filter{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:var(--text-2);border:1px solid var(--border);border-radius:99px;padding:2px 8px;background:var(--surface-2)}
+.filter b{font-weight:600;color:var(--text)}
+.panel-body{padding:13px}
+table{width:100%;border-collapse:collapse}
+thead th{font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);text-align:left;font-weight:400;padding:8px 13px;border-bottom:1px solid var(--border);background:var(--surface-2);white-space:nowrap}
+thead th.r{text-align:right}
+tbody td{padding:9px 13px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--surface-2)}
+td.mono{font-family:var(--mono);font-size:11px;color:var(--text-2);white-space:nowrap}
+td.r{text-align:right;white-space:nowrap}
+.status{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);white-space:nowrap}
+.status i{width:6px;height:6px;border-radius:50%;background:var(--faint)}
+.pager{display:flex;align-items:center;gap:8px;padding:8px 13px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}
+.mini{list-style:none;margin:0;padding:4px 0}
+.mini li{display:flex;gap:8px;padding:8px 13px;font-size:11.5px}
+.mini li+li{border-top:1px solid var(--border)}
+.mini .t{flex:1;min-width:0}
+.mini .t b{display:block;font-weight:600;font-size:11.5px}
+.mini .t span{color:var(--muted);font-size:10.5px}
+.mini time{font-family:var(--mono);font-size:9.5px;color:var(--faint);white-space:nowrap}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:11px}
+.tile{display:block;text-align:left;padding:13px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);width:100%}
+.tile:hover{border-color:var(--border-strong);background:var(--surface-2)}
+.tile .k{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.tile b{display:block;font-size:13px;font-weight:600;margin:5px 0 3px}
+.tile p{margin:0;font-size:11px;color:var(--muted);line-height:1.5}
+.tile .go{display:block;margin-top:8px;font-size:11px;font-weight:600;color:var(--teal-ink)}
+[data-theme="dark"] .tile .go{color:var(--teal)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12px;margin:0}
+.kv dt{color:var(--faint);font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+.kv dd{margin:0;color:var(--text-2)}
+.form{display:grid;gap:13px;max-width:560px}
+.field label{display:block;font-size:11.5px;font-weight:600;margin-bottom:4px;color:var(--text-2)}
+.field .req{font-weight:400;color:var(--faint);font-size:10px;margin-left:4px}
+.input{width:100%;height:34px;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);padding:0 9px;font-size:12.5px}
+textarea.input{height:auto;padding:8px}
+.input:focus{outline:2px solid var(--teal);outline-offset:-1px;border-color:var(--teal)}
+.input[aria-invalid="true"]{border-color:var(--danger)}
+.checkbox{width:15px;height:15px}
+.hint{font-size:10.5px;color:var(--faint);margin-top:3px}
+.err{font-size:11px;color:var(--danger);margin-top:3px}
+.alert{display:flex;gap:8px;padding:8px 10px;border-radius:var(--radius);font-size:11.5px;margin-bottom:12px;line-height:1.45;background:var(--surface-2)}
+.alert.bad{background:var(--danger-wash);color:var(--danger)}
+.alert.ok{background:var(--ok-wash);color:var(--ok)}
+.alert .t{color:var(--text-2)}
+.empty{padding:38px 16px;text-align:center}
+.empty h3{margin:0 0 4px;font-size:13px;font-weight:600}
+.empty p{margin:0 auto 11px;font-size:11.5px;color:var(--muted);max-width:44ch}
+.note{margin-top:16px;font-size:10.5px;color:var(--faint);max-width:82ch;line-height:1.55}
+.note b{color:var(--muted);font-weight:600}
+.soonbox{padding:12px 13px}
+.soonbox .badge{display:inline-flex;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--warn);background:var(--warn-wash);padding:2px 6px;border-radius:3px}
+.soonbox h3{font-size:12.5px;margin:8px 0 4px;font-weight:600}
+.soonbox p{margin:0;font-size:11.5px;color:var(--muted);line-height:1.5}
+.soonbox dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:9px 0 0;font-size:11px}
+.soonbox dt{color:var(--faint)} .soonbox dd{margin:0;color:var(--text-2)}
+.auth-wrap{display:grid;place-items:center;min-height:70vh;padding:36px 18px}
+.auth-card{width:100%;max-width:372px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:26px 24px 22px}
+.auth-card h1{font-size:19px;margin:0 0 5px;letter-spacing:-.02em;font-weight:600}
+.auth-card .sub{margin:0 0 18px;font-size:12.5px;color:var(--muted)}
+.auth-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--border);font-size:11.5px;color:var(--faint);text-align:center}
+.btn-block{width:100%;justify-content:center;height:37px}
+@media (max-width:1080px){.cols{grid-template-columns:1fr}.strip{grid-template-columns:repeat(2,1fr)}.metric:nth-child(2){border-right:0}}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .side{border-right:0;border-bottom:1px solid var(--border)}
+  .nav{display:flex;flex-wrap:wrap;gap:3px;padding:8px}
+  .nav-label{display:none}
+  .nav-item{width:auto;padding:6px 8px}
+  .content{padding:14px 12px 24px}
+  .page-head{flex-wrap:wrap}
+  .page-head .actions{margin-left:0;width:100%}
+  thead th,tbody td{padding:7px 9px}
+}
+
+/* ---------- theme control ---------- */
+[data-theme="dark"] .frame{border-color:var(--border-strong)}
+[data-theme="dark"] thead th{color:var(--muted)}
+[data-theme="dark"] .soonbox .badge{color:var(--warn)}
+[data-theme="dark"] .brand-name{color:var(--text)}
+[data-theme="dark"] .kv dd{color:var(--text-2)}
+.theme-btn{width:29px;height:29px;border-radius:var(--radius);display:grid;place-items:center;border:1px solid transparent;color:var(--muted);background:none;cursor:pointer}
+.theme-btn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border)}
+.nav-item .soon{margin-left:auto;font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--warn);background:var(--warn-wash);padding:1px 4px;border-radius:2px}
+
+/* ---------- status tone helpers used by templates ---------- */
+.tone-ok{color:var(--ok)} .tone-warn{color:var(--warn)} .tone-danger{color:var(--danger)} .tone-info{color:var(--info)}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--faint);margin-right:5px;vertical-align:middle}
+.dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.danger{background:var(--danger)} .dot.info{background:var(--info)}
+
+/* ---------- small helpers ---------- */
+.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.stack{display:grid;gap:16px}
+.mt{margin-top:16px}
+.mono{font-family:var(--mono)}
+.muted{color:var(--muted)}
+.small{font-size:11.5px}
+.right{margin-left:auto}
+.table-scroll{overflow-x:auto}
+</style>
+  <style>
+    .skip{position:absolute;left:-9999px}
+    .skip:focus{left:12px;top:12px;z-index:100;background:var(--surface);border:1px solid var(--border-strong);padding:8px 12px;border-radius:5px;font-size:12.5px}
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <svg width="23" height="23" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="24" height="24" rx="5" stroke="currentColor" stroke-width="1.4" class="mark-frame"/>
+        <path d="M7.5 17.5V8.5l11 9v-9" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" class="mark-glyph"/>
+      </svg>
+      <div>
+        <div class="brand-name">Sample Project</div>
+        <div class="brand-sub">Indirect materials</div>
+      </div>
+    </div>
+
+    
+    <nav class="nav">
+      
+        <div class="nav-label">Workspace</div>
+        <a class="nav-item on"
+           href="/workspace/enduser-maintenance-lead/dashboard/">Dashboard</a>
+        
+          <a class="nav-item "
+             href="/workspace/enduser-maintenance-lead/records/?module=needs">
+            Material needs
+          </a>
+        
+          <a class="nav-item "
+             href="/workspace/enduser-maintenance-lead/records/?module=requests">
+            My requests
+          </a>
+        
+          <a class="nav-item "
+             href="/workspace/enduser-maintenance-lead/records/?module=issues">
+            Issue slips
+          </a>
+        
+        <div class="nav-label">Account</div>
+        <a class="nav-item "
+           href="/workspace/enduser-maintenance-lead/access/">Access map</a>
+        <a class="nav-item "
+           href="/">My workspaces</a>
+        <a class="nav-item "
+           href="/password/change/">Change password</a>
+        <form method="post" action="/logout/"><input type="hidden" name="csrfmiddlewaretoken" value="d0splt40uB8sUEWr8zILFz77uTMVCVa5m3PweLZGYRAL3DIzrlgtXj7V2whwfFi4">
+          <button class="nav-item" type="submit">Sign out</button>
+        </form>
+      
+    </nav>
+    
+
+    
+    <div class="side-foot">
+      <div class="avatar">TE</div>
+      <div class="who">
+        <b>test_enduser</b>
+        <span>End-user / Maintenance Lead</span>
+      </div>
+    </div>
+    
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb"><span>Workspace</span><span>/</span><b>Dashboard</b></div>
+      <div class="topbar-right">
+        <span class="role-pill"><i></i>End-user / Maintenance Lead</span>
+        <button class="theme-btn" id="themeToggle" type="button" title="Switch theme" aria-label="Switch light or dark theme">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+            <circle cx="8" cy="8" r="3"/><path d="M8 1.6v1.2M8 13.2v1.2M1.6 8h1.2M13.2 8h1.2M3.5 3.5l.9.9M11.6 11.6l.9.9M12.5 3.5l-.9.9M4.4 11.6l-.9.9"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="content" id="main">
+      
+      
+<div class="page-head">
+  <div>
+    <h1>End-user / Maintenance Lead</h1>
+    <p>Record indirect material needs for your department and acknowledge issued items.</p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="/workspace/enduser-maintenance-lead/access/">Access map</a>
+    <a class="btn btn-primary" href="/workspace/enduser-maintenance-lead/needs/new/">New request</a>
+  </div>
+</div>
+
+<dl class="strip">
+  
+    <div class="metric">
+      <dt>Open needs</dt>
+      <dd><span class="num">1</span><span class="unit">records</span></dd>
+      <span class="src">From your requests</span>
+    </div>
+  
+    <div class="metric">
+      <dt>Awaiting my action</dt>
+      <dd><span class="num">0</span><span class="unit">records</span></dd>
+      <span class="src">Acknowledgement pending</span>
+    </div>
+  
+    <div class="metric">
+      <dt>Delivered</dt>
+      <dd><span class="num">1</span><span class="unit">records</span></dd>
+      <span class="src">From recorded receipts</span>
+    </div>
+  
+    <div class="metric">
+      <dt>Stock alerts</dt>
+      <dd><span class="num">1</span><span class="unit">items</span></dd>
+      <span class="src">From stock on hand</span>
+    </div>
+  
+</dl>
+
+<div class="cols">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Your modules</h2>
+      <span class="count">3 for this role</span>
+    </div>
+    <div class="panel-body">
+      <div class="tiles">
+        
+          <a class="tile" href="/workspace/enduser-maintenance-lead/records/?module=needs">
+            <span class="k">Available now</span>
+            <b>Material needs</b>
+            <p>Open the records for this module.</p>
+            <span class="go">Open →</span>
+          </a>
+        
+          <a class="tile" href="/workspace/enduser-maintenance-lead/records/?module=requests">
+            <span class="k">Available now</span>
+            <b>My requests</b>
+            <p>Open the records for this module.</p>
+            <span class="go">Open →</span>
+          </a>
+        
+          <a class="tile" href="/workspace/enduser-maintenance-lead/records/?module=issues">
+            <span class="k">Available now</span>
+            <b>Issue slips</b>
+            <p>Open the records for this module.</p>
+            <span class="go">Open →</span>
+          </a>
+        
+      </div>
+    </div>
+  </section>
+
+  <div class="stack">
+    <section class="panel">
+      <div class="panel-head"><h2>Awaiting you</h2><span class="count">0</span></div>
+      <ul class="mini">
+        
+          <li><div class="t"><b>Nothing waiting</b><span>No action is required from you right now.</span></div></li>
+        
+      </ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>System status</h2></div>
+      <div class="soonbox">
+        <span class="badge">Not connected</span>
+        <h3>SAP integration</h3>
+        <p>Balances, approvals and receipts are not read from or written to SAP.</p>
+        <dl><dt>Source</dt><dd>Manual entry</dd><dt>Last sync</dt><dd>None</dd></dl>
+      </div>
+    </section>
+  </div>
+</div>
+
+      <p class="note"><b>Development build.</b> Records are real database rows. SAP, email and payment steps are external and are recorded as references only.</p>
+    </main>
+  </div>
+</div>
+<script src="/static/js/app.js" defer></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5f75389c918b92e',t:'MTc5NTUxMTkwNg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5f75389c918b92e',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

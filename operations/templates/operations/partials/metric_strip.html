@@ -1,0 +1,9 @@
+<dl class="strip">
+  {% for m in metrics %}
+    <div class="metric">
+      <dt>{{ m.label }}</dt>
+      <dd><span class="num">{{ m.value|default_if_none:"—" }}</span><span class="unit">{{ m.unit }}</span></dd>
+      <span class="src">{{ m.source }}</span>
+    </div>
+  {% endfor %}
+</dl>
