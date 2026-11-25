@@ -6,7 +6,7 @@ from django.shortcuts import render, resolve_url
 from django.urls import reverse_lazy
 
 from .forms import StyledAuthenticationForm, StyledPasswordChangeForm
-
+from .roles import role_by_slug
 
 ROLE_PURPOSES = {
     "enduser-maintenance-lead": (
@@ -36,13 +36,35 @@ def _shell_context(request, crumb_current):
     }
 
 
+def _post_login_redirect(user):
+    """Return the correct URL for a user after a successful login."""
+    from operations.modules import modules_for_user, role_slugs_for_user
+
+    # Superuser or staff with no SIA role → Django Admin
+    if user.is_superuser:
+        return resolve_url("admin:index")
+
+    role_slugs = role_slugs_for_user(user)
+
+    # system-administrator has no operational modules → access map
+    if "system-administrator" in role_slugs:
+        return resolve_url("access_map")
+
+    # Any role that has operational modules → Workspace Dashboard
+    if modules_for_user(user):
+        return resolve_url("dashboard")
+
+    # Logged in but no recognized role assigned yet → My workspaces page
+    return resolve_url("overview")
+
+
 class ProjectLoginView(LoginView):
     authentication_form = StyledAuthenticationForm
     template_name = "accounts/login.html"
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        return resolve_url(settings.LOGIN_REDIRECT_URL)
+        return _post_login_redirect(self.request.user)
 
 
 class ProjectPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
@@ -80,8 +102,7 @@ def access_map(request):
                 )
             else:
                 capabilities.append(
-                    "List and open records in %s; no write control."
-                    % module["label"]
+                    "List and open records in %s; no write control." % module["label"]
                 )
         role_maps.append(
             {
@@ -92,8 +113,7 @@ def access_map(request):
                 ),
                 "allowed_modules": allowed,
                 "unavailable_modules": [
-                    module for module in MODULES
-                    if module["key"] not in allowed_keys
+                    module for module in MODULES if module["key"] not in allowed_keys
                 ],
                 "capabilities": capabilities,
             }

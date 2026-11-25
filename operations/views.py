@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
+from accounts.roles import role_by_slug
 from accounts.views import render_access_denied
 
 from .forms import DemonstrationForm
@@ -27,6 +28,8 @@ def _role_context(user):
 def dashboard(request):
     modules = modules_for_user(request.user)
     role_slugs = role_slugs_for_user(request.user)
+    if request.user.is_superuser or (request.user.is_staff and not role_slugs):
+        return redirect("admin:index")
     records_connected = False
     role = None
     description = None
@@ -39,6 +42,10 @@ def dashboard(request):
                 "Record indirect material needs for your department and "
                 "acknowledge issued items."
             )
+        elif len(role_slugs) == 1:
+            role_definition = role_by_slug(role_slugs[0])
+            if role_definition:
+                description = role_definition["purpose"]
 
     action_module = next(
         (module for module in modules if module["access"] == "act"),
