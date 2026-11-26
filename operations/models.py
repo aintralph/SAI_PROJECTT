@@ -52,6 +52,9 @@ class MaterialNeed(models.Model):
         on_delete=models.PROTECT,
         related_name="needs",
     )
+    area = models.CharField(max_length=100, blank=True)
+    description = models.TextField(blank=True)
+    specification = models.TextField(blank=True)
     quantity = models.DecimalField(max_digits=12, decimal_places=2)
     purpose = models.TextField(blank=True)
     needed_by = models.DateField(null=True, blank=True)
@@ -81,6 +84,7 @@ class PurchaseRequest(models.Model):
         DRAFT = "draft", "Draft"
         PENDING_ODM = "pending_odm", "Pending ODM Decision"
         APPROVED = "approved", "Approved"
+        RETURNED = "returned", "Returned for Correction"
         REJECTED = "rejected", "Rejected"
 
     reference = models.CharField(max_length=30, unique=True, db_index=True)
@@ -135,6 +139,9 @@ class Quotation(models.Model):
     unit_price = models.DecimalField(max_digits=12, decimal_places=2)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
     lead_time_days = models.PositiveIntegerField(null=True, blank=True)
+    payment_terms = models.CharField(max_length=150, blank=True)
+    warranty = models.CharField(max_length=150, blank=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     is_selected = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
     created_by = models.ForeignKey(
@@ -300,7 +307,9 @@ class Invoice(models.Model):
     class Status(models.TextChoices):
         LOGGED = "logged", "Logged by DCT"
         HANDED_OFF = "handed_off", "Handed Off to Accounting"
-        APPROVED = "approved", "Approved"
+        MATCHED = "matched", "Matched and Cleared"
+        DISPUTED = "disputed", "Disputed"
+        ON_HOLD = "on_hold", "On Hold (No Goods)"
         RETURNED = "returned", "Returned"
 
     reference = models.CharField(max_length=30, unique=True, db_index=True)

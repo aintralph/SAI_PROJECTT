@@ -128,6 +128,10 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "login"
 
+# Session expires when the browser is closed, so every fresh browser open
+# requires a new login rather than resuming a stale authenticated session.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration

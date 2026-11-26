@@ -58,6 +58,20 @@ def _post_login_redirect(user):
     return resolve_url("overview")
 
 
+def root_redirect(request):
+    """
+    Entry point for the site root ('/').
+
+    - Anonymous users  → login page
+    - Authenticated users → role-based destination (same logic as post-login)
+    """
+    from django.shortcuts import redirect as _redirect
+
+    if not request.user.is_authenticated:
+        return _redirect("login")
+    return _redirect(_post_login_redirect(request.user))
+
+
 class ProjectLoginView(LoginView):
     authentication_form = StyledAuthenticationForm
     template_name = "accounts/login.html"
