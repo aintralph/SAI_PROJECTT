@@ -14,6 +14,16 @@ class Material(models.Model):
 
     class Meta:
         ordering = ["name"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(stock_on_hand__gte=0),
+                name="material_stock_on_hand_non_negative",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(reorder_level__gte=0),
+                name="material_reorder_level_non_negative",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.code} - {self.name}"
@@ -55,6 +65,12 @@ class MaterialNeed(models.Model):
     area = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
     specification = models.TextField(blank=True)
+    sap_material_code = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Optional SAP material code. Leave blank for a non-standard item.",
+    )
     quantity = models.DecimalField(max_digits=12, decimal_places=2)
     purpose = models.TextField(blank=True)
     needed_by = models.DateField(null=True, blank=True)
@@ -74,6 +90,12 @@ class MaterialNeed(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(quantity__gt=0),
+                name="material_need_quantity_positive",
+            ),
+        ]
 
     def __str__(self):
         return self.reference
@@ -119,6 +141,12 @@ class PurchaseRequest(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["material_need"],
+                name="one_purchase_request_per_need",
+            ),
+        ]
 
     def __str__(self):
         return self.reference
@@ -143,16 +171,40 @@ class Quotation(models.Model):
     warranty = models.CharField(max_length=150, blank=True)
     score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     is_selected = models.BooleanField(default=False)
+    selection_notes = models.TextField(blank=True, default="")
     notes = models.TextField(blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name="created_quotations",
     )
+    selected_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="selected_quotations",
+    )
+    selected_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(unit_price__gte=0),
+                name="quotation_unit_price_non_negative",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(total_amount__gte=0),
+                name="quotation_total_amount_non_negative",
+            ),
+            models.UniqueConstraint(
+                fields=["purchase_request"],
+                condition=models.Q(is_selected=True),
+                name="one_selected_quotation_per_request",
+            ),
+        ]
 
     def __str__(self):
         return self.reference
@@ -165,6 +217,8 @@ class PurchaseOrder(models.Model):
         STRATEGIC_APPROVAL = "strategic_approval", "Pending Strategic Approval"
         APPROVED = "approved", "Approved"
         REJECTED = "rejected", "Rejected"
+        PARTIALLY_DELIVERED = "partially_delivered", "Partially Delivered"
+        DELIVERED = "delivered", "Delivered"
 
     reference = models.CharField(max_length=30, unique=True, db_index=True)
     purchase_request = models.ForeignKey(
@@ -213,11 +267,24 @@ class PurchaseOrder(models.Model):
         related_name="approved_pos",
     )
     approved_at = models.DateTimeField(null=True, blank=True)
+    review_notes = models.TextField(blank=True, default="")
+    approval_notes = models.TextField(blank=True, default="")
+    delivered_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(total_amount__gte=0),
+                name="purchase_order_total_amount_non_negative",
+            ),
+            models.UniqueConstraint(
+                fields=["purchase_request"],
+                name="one_purchase_order_per_request",
+            ),
+        ]
 
     def __str__(self):
         return self.reference
@@ -244,6 +311,12 @@ class Delivery(models.Model):
     class Meta:
         verbose_name_plural = "Deliveries"
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(quantity_received__gt=0),
+                name="delivery_quantity_positive",
+            ),
+        ]
 
     def __str__(self):
         return self.reference
@@ -253,6 +326,7 @@ class IssueSlip(models.Model):
     class Status(models.TextChoices):
         ISSUED = "issued", "Issued (Awaiting Acknowledgement)"
         ACKNOWLEDGED = "acknowledged", "Acknowledged"
+        DISPUTED = "disputed", "Disputed by Requester"
 
     reference = models.CharField(max_length=30, unique=True, db_index=True)
     material_need = models.ForeignKey(
@@ -295,9 +369,16 @@ class IssueSlip(models.Model):
         related_name="acknowledged_slips",
     )
     acknowledged_at = models.DateTimeField(null=True, blank=True)
+    condition_notes = models.TextField(blank=True, default="")
 
     class Meta:
         ordering = ["-issued_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(quantity_issued__gt=0),
+                name="issue_slip_quantity_positive",
+            ),
+        ]
 
     def __str__(self):
         return self.reference
@@ -334,6 +415,7 @@ class Invoice(models.Model):
         db_index=True,
     )
     remarks = models.TextField(blank=True)
+    review_remarks = models.TextField(blank=True, default="")
     logged_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -360,9 +442,89 @@ class Invoice(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(amount__gte=0),
+                name="invoice_amount_non_negative",
+            ),
+        ]
 
     def __str__(self):
         return self.reference
+
+
+class StockMovement(models.Model):
+    class Reason(models.TextChoices):
+        DELIVERY_RECEIPT = "delivery_receipt", "Delivery receipt"
+        ISSUE = "issue", "Issue to requester"
+        ADJUSTMENT = "adjustment", "Stock adjustment"
+
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.PROTECT,
+        related_name="stock_movements",
+    )
+    delta = models.DecimalField(max_digits=12, decimal_places=2)
+    reason = models.CharField(
+        max_length=30,
+        choices=Reason.choices,
+        default=Reason.ADJUSTMENT,
+        db_index=True,
+    )
+    note = models.TextField(blank=True, default="")
+    delivery = models.ForeignKey(
+        Delivery,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="stock_movements",
+    )
+    issue = models.ForeignKey(
+        IssueSlip,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="stock_movements",
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="stock_movements",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=~models.Q(delta=0),
+                name="stock_movement_delta_non_zero",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.material} {self.delta:+} ({self.get_reason_display()})"
+
+
+class ReferenceCounter(models.Model):
+    prefix = models.CharField(max_length=10)
+    year = models.PositiveIntegerField()
+    last_value = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["prefix", "year"],
+                name="unique_reference_counter_per_prefix_year",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(last_value__gte=0),
+                name="reference_counter_non_negative",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.prefix}-{self.year}: {self.last_value}"
 
 
 class AuditLog(models.Model):

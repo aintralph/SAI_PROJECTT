@@ -111,6 +111,7 @@ ROLE_ACCESS = {
         "needs": "act",
         "requests": "read",
         "deliveries": "read",
+        "stock": "read",
         "issues": "act",
     },
     "pr-creator": {
@@ -126,6 +127,7 @@ ROLE_ACCESS = {
         "requests": "read",
         "quotations": "act",
         "orders": "act",
+        "stock": "read",
     },
     "procurement-site-lead": {
         "requests": "read",
@@ -141,6 +143,7 @@ ROLE_ACCESS = {
         "requests": "read",
         "orders": "read",
         "deliveries": "act",
+        "stock": "act",
         "issues": "act",
     },
     "dct": {
