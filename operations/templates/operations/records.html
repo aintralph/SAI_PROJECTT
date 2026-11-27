@@ -11,7 +11,10 @@
     <p>Access: {{ module.access }}</p>
   </div>
   <div class="actions">
-    <a class="btn btn-primary" href="{% url 'dashboard' %}">Dashboard</a>
+    {% if can_create %}
+      <a class="btn btn-primary" href="{{ new_url }}">New record</a>
+    {% endif %}
+    <a class="btn btn-ghost" href="{% url 'dashboard' %}">Dashboard</a>
   </div>
 </div>
 

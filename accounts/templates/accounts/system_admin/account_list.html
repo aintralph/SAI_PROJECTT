@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Accounts | Sample Project{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Accounts</h1><p>Manage authorized accounts and recognized SIA role membership.</p></div>
+  <div class="actions"><a class="btn btn-primary" href="{% url 'system_admin_account_create' %}">Create account</a></div>
+</div>
+<dl class="account-summary" aria-label="Account summary">
+  <div><dt>Total accounts</dt><dd>{{ summary.total }}</dd></div>
+  <div><dt>Active accounts</dt><dd>{{ summary.active }}</dd></div>
+  <div><dt>Staff accounts</dt><dd>{{ summary.staff }}</dd></div>
+  <div><dt>Accounts without a recognized SIA role</dt><dd>{{ summary.no_role }}</dd></div>
+</dl>
+<section class="panel accounts-panel">
+  <div class="panel-head filter-panel-head">
+    <form method="get" class="account-filter-toolbar" role="search" aria-label="Filter accounts">
+      <div class="filter-field filter-search">
+        <label for="q">Search accounts</label>
+        <div class="search-combobox" data-search-combobox>
+          <input class="input" type="search" id="q" name="q" value="{{ search }}" autocomplete="off" placeholder="Username, name, or email" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="account-suggestions">
+          <ul class="search-combobox-list" id="account-suggestions" role="listbox" hidden>
+            {% for suggestion in search_suggestions %}
+            <li class="search-combobox-option" id="account-suggestion-{{ forloop.counter }}" role="option" aria-selected="false" data-value="{{ suggestion.value }}" data-search="{{ suggestion.filter|escape }}">
+              <span class="search-option-primary" title="{{ suggestion.primary }}">{{ suggestion.primary }}</span>
+              {% if suggestion.secondary %}<span class="search-option-secondary" title="{{ suggestion.secondary }}">{{ suggestion.secondary }}</span>{% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="filter-field">
+        <label for="status">Status</label>
+        <div class="custom-select" data-custom-select>
+          <select class="input custom-select-native" id="status" name="status">
+            <option value="">All statuses</option>
+            <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter == "inactive" %}selected{% endif %}>Inactive</option>
+          </select>
+          <button class="custom-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="status-listbox"></button>
+          <ul class="custom-select-list" id="status-listbox" role="listbox" hidden></ul>
+        </div>
+      </div>
+      <div class="filter-field filter-role">
+        <label for="role">Role</label>
+        <div class="custom-select" data-custom-select>
+          <select class="input custom-select-native" id="role" name="role">
+            <option value="">All roles</option>
+            <option value="none" {% if role_filter == "none" %}selected{% endif %}>No recognized role</option>
+            {% for role in roles %}<option value="{{ role.slug }}" {% if role_filter == role.slug %}selected{% endif %}>{{ role.label }}</option>{% endfor %}
+          </select>
+          <button class="custom-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="role-listbox"></button>
+          <ul class="custom-select-list" id="role-listbox" role="listbox" hidden></ul>
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">Apply filters</button>
+        {% if search or status_filter or role_filter %}
+        <a class="btn btn-ghost" href="{% url 'system_admin_accounts' %}">Clear filters</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+  <div class="accounts-result-header">
+    <strong>{{ page_obj.paginator.count }} account{{ page_obj.paginator.count|pluralize }}</strong>
+    {% if search or status_filter or role_filter %}<span>Filtered results</span>{% else %}<span>All accounts</span>{% endif %}
+  </div>
+  <div class="table-scroll">
+    <table class="accounts-table">
+      <thead><tr><th scope="col" class="account-column">Account</th><th scope="col" class="role-column">Role</th><th scope="col" class="status-column">Status</th><th scope="col" class="privilege-column">Privileges</th><th scope="col" class="date-column">Last login</th><th scope="col" class="date-column">Date joined</th><th scope="col" class="action-column"><span class="visually-hidden">Actions</span></th></tr></thead>
+      <tbody>
+      {% for account in page_obj %}
+      <tr>
+        <td>
+          <div class="account-identity">
+            <span class="account-avatar" aria-hidden="true">{{ account.initials }}</span>
+            <div class="account-identity-text">
+              <strong title="{{ account.username }}">{{ account.username }}</strong>
+              {% with full_name=account.get_full_name %}
+                {% if full_name %}
+                  <span title="{{ full_name }}">{{ full_name }}</span>
+                {% endif %}
+                {% if account.email %}
+                  <small title="{{ account.email }}">{{ account.email }}</small>
+                {% endif %}
+                {% if not full_name and not account.email %}
+                  <small class="profile-details-empty">No profile details</small>
+                {% endif %}
+              {% endwith %}
+            </div>
+          </div>
+        </td>
+        <td>{% if account.recognized_role_label %}<span class="role-badge" title="{{ account.recognized_role_label }}">{{ account.recognized_role_label }}</span>{% else %}<span class="badge badge-neutral">No recognized role</span>{% endif %}</td>
+        <td>{% if account.is_active %}<span class="badge badge-active"><i aria-hidden="true"></i>Active</span>{% else %}<span class="badge badge-inactive"><i aria-hidden="true"></i>Inactive</span>{% endif %}</td>
+        <td>
+          {% if account.is_staff or account.is_superuser %}
+            {% if account.is_staff %}<span class="privilege-badge">Staff</span>{% endif %}
+            {% if account.is_superuser %}<span class="privilege-badge">Superuser</span>{% endif %}
+          {% else %}<span class="muted small">Standard account</span>{% endif %}
+        </td>
+        <td class="mono timestamp-cell">{% if account.last_login %}<time datetime="{{ account.last_login|date:'c' }}" title="{{ account.last_login|date:'Y-m-d H:i:s T' }}">{{ account.last_login|date:"M j, Y, H:i" }}</time>{% else %}<span title="This account has not logged in">Never</span>{% endif %}</td>
+        <td class="mono timestamp-cell"><time datetime="{{ account.date_joined|date:'c' }}" title="{{ account.date_joined|date:'Y-m-d H:i:s T' }}">{{ account.date_joined|date:"M j, Y" }}</time></td>
+        <td class="r action-cell"><a class="btn btn-ghost manage-account" href="{% url 'system_admin_account_edit' account.pk %}" aria-label="Manage account for {{ account.username }}">Manage account</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7"><div class="empty"><h3>No accounts found</h3><p>Try a different search or clear the active filters.</p>{% if search or status_filter or role_filter %}<a class="btn" href="{% url 'system_admin_accounts' %}">Clear filters</a>{% endif %}</div></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div class="pager">
+    {% if page_obj.has_previous %}<a class="btn btn-ghost" href="?page={{ page_obj.previous_page_number }}&q={{ search|urlencode }}&status={{ status_filter|urlencode }}&role={{ role_filter|urlencode }}">Previous</a>{% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="btn btn-ghost" href="?page={{ page_obj.next_page_number }}&q={{ search|urlencode }}&status={{ status_filter|urlencode }}&role={{ role_filter|urlencode }}">Next</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

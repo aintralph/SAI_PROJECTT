@@ -160,3 +160,11 @@ All classes defined in `static/css/main.css` (including state/modifier classes):
 - Added one component rule block: `.auth-bar`.
 - Sidebar navigation and the current-user footer render only for authenticated users.
 - Theme icons now switch by theme using `.theme-moon` and `.theme-sun`; the button label describes the action.
+
+## Amendment — 2026-11-27 (operational workflow wiring)
+
+- Added the `stock` module key (`Stock on hand`) to the module registry and to the operational sidebar for the roles in `accounts.roles.ROLE_ACCESS`.
+- Module access remains presentation only. Server-side capability checks and object scoping live in `operations/policies.py`; state changes live in `operations/services.py`.
+- Added POST-only action endpoints for ODM request decisions, PO first review, PO final approval, PO resubmission, quotation selection, issue acknowledgement/dispute, invoice handoff, and Accounting review. No state-changing GET routes were added.
+- Added a stock movement ledger section on the stock detail screen using the existing panel/table classes. No CSS, layout, colour, spacing, or responsive rules were changed.
+- `SIA_mock_ui_v2_corrected.html` was not present in the repository during this work; the existing templates and the read-only `_design_source` reference were used without a redesign.

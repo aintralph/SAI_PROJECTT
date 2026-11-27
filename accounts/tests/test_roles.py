@@ -183,10 +183,10 @@ class SyncRoleUsersCommandTests(TestCase):
                 password=password,
             )
         )
-        dashboard = client.get("/")
-        records = client.get("/records/needs/")
+        dashboard = client.get("/", follow=True)
+        records = client.get("/workspace/records/needs/")
 
         self.assertEqual(dashboard.status_code, 200)
         self.assertEqual(records.status_code, 200)
         self.assertContains(dashboard, "Not connected")
-        self.assertContains(records, "Not connected")
+        self.assertContains(records, "No records yet")

@@ -22,6 +22,7 @@ MODULES = [
     _module("quotations", "Quotations"),
     _module("orders", "Purchase orders"),
     _module("deliveries", "Deliveries"),
+    _module("stock", "Stock on hand"),
     _module("issues", "Issue slips"),
     _module("invoices", "Invoices"),
 ]
