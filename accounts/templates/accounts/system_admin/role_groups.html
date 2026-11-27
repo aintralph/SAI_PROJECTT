@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Role groups | Sample Project{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Role groups</h1><p>Known SIA role groups are controlled by code and synchronized with the role management command.</p></div>
+</div>
+<section class="panel">
+  <div class="panel-head"><h2>Code-defined roles</h2><span class="count">{{ role_rows|length }} roles</span></div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Label</th><th>Slug</th><th>Purpose</th><th>Capabilities</th><th>Active</th><th>Total</th></tr></thead>
+      <tbody>
+      {% for role in role_rows %}
+      <tr>
+        <td><b>{{ role.label }}</b></td>
+        <td class="mono">{{ role.slug }}</td>
+        <td>{{ role.purpose }}</td>
+        <td>{{ role.capabilities|join:", " }}</td>
+        <td>{{ role.active_member_count }}</td>
+        <td>{{ role.total_member_count }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6"><div class="empty"><h3>No role groups configured</h3><p>Run the role synchronization command after updating code definitions.</p></div></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<p class="note"><b>Separate privileges.</b> Django staff and superuser status is controlled in Django Admin and is not membership in an SIA role group. Role membership is managed by account create and edit forms.</p>
+{% endblock %}

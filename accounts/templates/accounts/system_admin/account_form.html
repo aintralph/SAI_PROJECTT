@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{% if account %}Edit account{% else %}Create account{% endif %} | Sample Project{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% if account %}Edit account: {{ account.username }}{% else %}Create account{% endif %}</h1>
+    <p>{% if account %}Update identity, organization access, role, and account status.{% else %}Set identity, organization access, role, and sign-in status on one page.{% endif %}</p>
+  </div>
+</div>
+<form method="post" class="account-form">
+  {% csrf_token %}
+  {% if form.errors %}
+  <div class="alert bad error-summary" role="alert" tabindex="-1">
+    <div><strong>Please correct the highlighted fields.</strong>
+      <ul>
+      {% for field in form %}
+        {% for error in field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}
+      {% endfor %}
+      {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  <section class="panel form-section" aria-labelledby="identity-heading">
+    <div class="panel-head"><h2 id="identity-heading">Identity</h2></div>
+    <div class="panel-body form-grid">
+      {% if not account %}{% include "partials/field.html" with field=form.username %}{% endif %}
+      {% include "partials/field.html" with field=form.first_name %}
+      {% include "partials/field.html" with field=form.last_name %}
+      {% include "partials/field.html" with field=form.email %}
+    </div>
+  </section>
+
+  <section class="panel form-section" aria-labelledby="organization-heading">
+    <div class="panel-head"><h2 id="organization-heading">Organization and role</h2></div>
+    <div class="panel-body form-grid">
+      {% include "partials/field.html" with field=form.employee_id %}
+      {% include "partials/field.html" with field=form.department %}
+      {% include "partials/field.html" with field=form.role %}
+    </div>
+  </section>
+
+  <section class="panel form-section" aria-labelledby="security-heading">
+    <div class="panel-head"><h2 id="security-heading">{% if account %}Status{% else %}Security and status{% endif %}</h2></div>
+    <div class="panel-body form-grid">
+      {% if not account %}
+        {% include "partials/field.html" with field=form.password1 %}
+        {% include "partials/field.html" with field=form.password2 %}
+      {% endif %}
+      {% include "partials/field.html" with field=form.is_active %}
+    </div>
+  </section>
+
+  {% if account and account.is_staff or account and account.is_superuser %}
+  <p class="hint privilege-explanation">Django staff and superuser status is separate and must be managed in Django Admin.</p>
+  {% endif %}
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit" data-once>{% if account %}Save account changes{% else %}Create account{% endif %}</button>
+    <a class="btn" href="{% url 'system_admin_accounts' %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

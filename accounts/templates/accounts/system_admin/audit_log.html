@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Audit log | Sample Project{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Audit log</h1><p>Read-only administrative and authentication activity.</p></div>
+</div>
+<section class="panel">
+  <div class="panel-head">
+    <form method="get" class="audit-filter-toolbar" role="search" aria-label="Filter audit log">
+      <div class="filter-field filter-search">
+        <label for="q">Search audit log</label>
+        <div class="search-combobox" data-search-combobox>
+          <input class="input" type="search" id="q" name="q" value="{{ search }}" autocomplete="off" placeholder="Reference or actor" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="audit-suggestions">
+          <ul class="search-combobox-list" id="audit-suggestions" role="listbox" hidden>
+            {% for suggestion in audit_suggestions %}
+            <li class="search-combobox-option" id="audit-suggestion-{{ forloop.counter }}" role="option" aria-selected="false" data-value="{{ suggestion.value }}" data-search="{{ suggestion.filter|escape }}">
+              <span class="search-option-primary" title="{{ suggestion.primary }}">{{ suggestion.primary }}</span>
+              {% if suggestion.secondary %}<span class="search-option-secondary" title="{{ suggestion.secondary }}">{{ suggestion.secondary }}</span>{% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="filter-field">
+        <label for="module">Module</label>
+        <div class="custom-select" data-custom-select>
+          <select class="input custom-select-native" id="module" name="module"><option value="">All modules</option>{% for module in modules %}<option value="{{ module }}" {% if module_filter == module %}selected{% endif %}>{{ module }}</option>{% endfor %}</select>
+          <button class="custom-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="module-listbox"></button>
+          <ul class="custom-select-list" id="module-listbox" role="listbox" hidden></ul>
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary" type="submit">Apply filters</button>
+        {% if search or module_filter or action_filter %}<a class="btn btn-ghost" href="{% url 'system_admin_audit_log' %}">Clear filters</a>{% endif %}
+      </div>
+    </form>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Timestamp</th><th>Actor</th><th>Module</th><th>Record/reference</th><th>Action</th><th>Old status</th><th>New status</th><th>Details</th></tr></thead>
+      <tbody>
+      {% for entry in page_obj %}
+      <tr>
+        <td class="mono">{{ entry.created_at|date:"Y-m-d H:i:s" }}</td>
+        <td>{{ entry.actor.username|default:"System" }}</td>
+        <td>{{ entry.module }}</td>
+        <td class="mono">{{ entry.record_reference|default:"—" }}</td>
+        <td>{{ entry.action }}</td>
+        <td>{{ entry.old_status|default:"—" }}</td>
+        <td>{{ entry.new_status|default:"—" }}</td>
+        <td>{{ entry.details|default:"—" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8"><div class="empty"><h3>No audit entries</h3><p>Account and authentication activity will appear here.</p></div></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <div class="pager">
+    {% if page_obj.has_previous %}<a class="btn btn-ghost" href="?page={{ page_obj.previous_page_number }}&q={{ search }}&module={{ module_filter }}">Previous</a>{% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="btn btn-ghost" href="?page={{ page_obj.next_page_number }}&q={{ search }}&module={{ module_filter }}">Next</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

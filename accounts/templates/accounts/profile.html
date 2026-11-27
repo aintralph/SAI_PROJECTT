@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Profile | Sample Project{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>Profile</h1><p>Your account information.</p></div>
+</div>
+<section class="panel">
+  <div class="panel-head"><h2>{{ request.user.username }}</h2></div>
+  <div class="panel-body">
+    <dl class="kv">
+      <dt>Username</dt><dd>{{ request.user.username }}</dd>
+      <dt>Full name</dt><dd>{{ request.user.get_full_name|default:"—" }}</dd>
+      <dt>Email</dt><dd>{{ request.user.email|default:"—" }}</dd>
+      <dt>Employee ID</dt><dd>{{ profile.employee_id|default:"—" }}</dd>
+      <dt>Department</dt><dd>{{ profile.department|default:"—" }}</dd>
+      <dt>Recognized SIA role</dt><dd>{{ recognized_role.label|default:"No recognized role" }}</dd>
+      <dt>Active status</dt><dd>{% if request.user.is_active %}Active{% else %}Inactive{% endif %}</dd>
+      <dt>Last login</dt><dd>{{ request.user.last_login|date:"Y-m-d H:i"|default:"Never" }}</dd>
+      <dt>Date joined</dt><dd>{{ request.user.date_joined|date:"Y-m-d" }}</dd>
+    </dl>
+  </div>
+</section>
+{% endblock %}

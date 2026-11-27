@@ -1,10 +1,31 @@
-<div class="field">
-  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-  {{ field }}
-  {% for error in field.errors %}
-    <div class="err">{{ error }}</div>
-  {% endfor %}
-  {% if field.help_text %}
-    <div class="hint">{{ field.help_text }}</div>
+{% if field.field.widget.input_type == "checkbox" %}
+<div class="field checkbox-field">
+  <label class="checkbox-control" for="{{ field.id_for_label }}">
+    {{ field }}
+    <span class="checkbox-copy">
+      <strong>{{ field.label }}</strong>
+      {% if field.help_text %}
+        <span class="hint" id="{{ field.id_for_label }}-help">{{ field.help_text }}</span>
+      {% endif %}
+    </span>
+  </label>
+  {% if field.errors %}
+    <div class="err" id="{{ field.id_for_label }}-error">
+      {% for error in field.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+    </div>
   {% endif %}
 </div>
+{% else %}
+<div class="field{% if field.name == 'role' %} role-field{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% if field.errors %}
+    <div class="err" id="{{ field.id_for_label }}-error">
+      {% for error in field.errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+    </div>
+  {% endif %}
+  {% if field.help_text %}
+    <div class="hint{% if field.name == 'password1' %} password-guidance{% endif %}" id="{{ field.id_for_label }}-help">{{ field.help_text|safe }}</div>
+  {% endif %}
+</div>
+{% endif %}

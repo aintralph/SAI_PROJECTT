@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}System Administrator | Sample Project{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Hello, {{ request.user.get_full_name|default:request.user.username }}</h1>
+    <p>System Administrator<br>Manage authorized accounts and access. Administrative links require the appropriate project role. Django staff and superuser access remain separate.</p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{% url 'system_admin_account_create' %}">Create account</a>
+  </div>
+</div>
+
+<dl class="strip">
+  {% for metric in metrics %}
+  <div class="metric">
+    <dt>{{ metric.label }}</dt>
+    <dd><span class="num">{{ metric.value }}</span><span class="unit">{{ metric.unit }}</span></dd>
+    <span class="src">{{ metric.source }}</span>
+  </div>
+  {% endfor %}
+</dl>
+
+<div class="cols">
+  <div class="stack">
+    <section class="panel">
+      <div class="panel-head"><h2>Administration modules</h2></div>
+      <div class="panel-body">
+        <div class="tiles">
+          <a class="tile" href="{% url 'system_admin_accounts' %}"><span class="k">Manage</span><b>Accounts</b><p>Create and edit authorized accounts.</p><span class="go">Open →</span></a>
+          <a class="tile" href="{% url 'system_admin_role_groups' %}"><span class="k">Configure</span><b>Role groups</b><p>Review code-defined SIA role groups.</p><span class="go">Open →</span></a>
+          <a class="tile" href="{% url 'system_admin_audit_log' %}"><span class="k">Review</span><b>Audit log</b><p>Read account and authentication activity.</p><span class="go">Open →</span></a>
+          <div class="tile"><span class="k"><span class="soon">Configured later</span></span><b>Access review</b><p>Review workflows are not implemented yet.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Recent accounts</h2><span class="right"><a class="btn btn-ghost" href="{% url 'system_admin_accounts' %}">View all</a></span></div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Account</th><th>Role group</th><th>Status</th><th>Last sign-in</th></tr></thead>
+          <tbody>
+          {% for account in recent_users %}
+          <tr>
+            <td><b>{{ account.username }}</b>{% if account.is_staff %}<br><span class="small muted">Django staff</span>{% endif %}{% if account.is_superuser %}<br><span class="small muted">Django superuser</span>{% endif %}</td>
+            <td>{% for role in roles %}{% endfor %}{% for group in account.groups.all %}{% if forloop.first %}{{ group.name }}{% else %}, {{ group.name }}{% endif %}{% empty %}<span class="muted">No recognized role</span>{% endfor %}</td>
+            <td><span class="status"><i></i>{% if account.is_active %}Active{% else %}Inactive{% endif %}</span></td>
+            <td>{{ account.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">No accounts exist yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <aside class="panel">
+    <div class="panel-head"><h2>Awaiting you</h2></div>
+    {% if active_no_role or role_waiting %}
+    <ul class="mini">
+      {% if active_no_role %}<li><div class="t"><b>{{ active_no_role }} active accounts</b><span>Have no recognized SIA role</span></div></li>{% endif %}
+      {% for role_label in role_waiting %}<li><div class="t"><b>{{ role_label }}</b><span>Has no active members</span></div></li>{% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty"><h3>All clear</h3><p>Every active account has a role and every role group has a member.</p></div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}
